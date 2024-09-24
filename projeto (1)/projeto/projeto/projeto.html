@@ -1,0 +1,516 @@
+<html>
+
+<head>
+	<title>Projeto</title>
+	<style>
+		body {
+			margin: 0;
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%
+		}
+	</style>
+</head>
+
+<body>
+	<script src="js/three.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/loaders/GLTFLoader.js"></script>
+
+	<script>
+		var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+		var renderer = new THREE.WebGLRenderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+		var controls = new THREE.OrbitControls( camera, renderer.domElement );
+		//--------
+
+		const gridHelper = new THREE.GridHelper(10, 10);
+		// scene.add(gridHelper);
+
+		const axesHelper = new THREE.AxesHelper(5); // Cria um guia para os eixos cartesianos
+		// scene.add(axesHelper); 						// Adiciona os eixos na cena
+
+		// Iluminação		
+		const directLight = new THREE.DirectionalLight(0xffffff, 1);
+		directLight.position.set(-150, 0, 40);
+		directLight.target.position.set(0, 0, 0);
+
+		const pointlight5 = new THREE.PointLight( 0xffffff, 0.5, 100);
+		pointlight5.position.set( 17, 5, 0);
+		pointlight5.distance = 30; 
+		scene.add( pointlight5 );
+		
+		const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+		scene.add(ambientLight, directLight);
+		scene.add(directLight.target);
+
+		const pointlight = new THREE.PointLight( 0xffffff, 10, 100);
+		pointlight.position.set( -100, 10, 40);
+		pointlight.distance = 100; 
+		scene.add( pointlight );
+
+		const pointlight2 = new THREE.PointLight( 0xffffff, 10, 100);
+		pointlight2.position.set( -100, -30, -40);
+		pointlight2.distance = 100; 
+		scene.add( pointlight2 );
+
+		const pointlight3 = new THREE.PointLight( 0xffffff, 10, 100);
+		pointlight3.position.set( -100, 30, 100);
+		pointlight3.distance = 100; 
+		scene.add( pointlight3 );
+
+		const pointlight4 = new THREE.PointLight( 0xffffff, 10, 100);
+		pointlight4.position.set( -170, -50, -70);
+		pointlight4.distance = 100; 
+		scene.add( pointlight4 );
+
+		// Instancia objeto do tipo loader
+		const gltfLoader = new THREE.GLTFLoader();
+
+		// Criando variável para armazenar caminho do arquivo gltf
+		const urlnave = 'assets/low_poly_starship/scene.gltf';
+		const urldes = 'assets/destruidor/scene.gltf';
+
+		// metodo satelite
+		gltfLoader.load(urlnave, (gltf) => {
+			gltf.scene.scale.set(0.03, 0.03, 0.03);
+			const root = gltf.scene;
+			console.log(dumpObject(root).join('\n')); // Chamando função dumpObject
+			satelite = root.getObjectByName('Sketchfab_Scene');
+			scene.add(root);
+
+			// Posição e rotação satelite
+			satelite.position.x = 5.6;
+			satelite.rotateY(1.5708);
+
+			// Adicionando rotação local do satelite
+			satelite.localRotation = new THREE.Euler(0, 0, 0);
+		});		
+
+		//metodo destruidor
+		gltfLoader.load(urldes, (gltf) => {
+			gltf.scene.scale.set(0.1, 0.1, 0.1);
+			const root = gltf.scene;
+			console.log(dumpObject(root).join('\n')); // Chamando função dumpObject
+			destruidor = root.getObjectByName('Sketchfab_Scene');
+			scene.add(root);
+
+			// Posição e rotação destroyer
+			destruidor.position.x = 5.6;
+			destruidor.position.y = 5.6;
+			destruidor.position.z = 1.6;
+			destruidor.rotateY(1.5708);
+
+			// Adicionando rotação local ao destroyer
+			destruidor.localRotation = new THREE.Euler(0, 0, 0);
+		});
+
+		//destruidor 2
+		gltfLoader.load(urldes, (gltf) => {
+			gltf.scene.scale.set(0.1, 0.1, 0.1);
+			const root = gltf.scene;
+			console.log(dumpObject(root).join('\n')); // Chamando função dumpObject
+			destruidor2 = root.getObjectByName('Sketchfab_Scene');
+			scene.add(root);
+
+			// Posição e rotação destroyer
+			destruidor2.position.x = 7.6;
+			destruidor2.position.y = 5.6;
+			destruidor2.position.z = 1.6;
+			destruidor2.rotateY(1.5708);
+
+			// Adicionando rotação local ao destroyer
+			destruidor2.localRotation = new THREE.Euler(0, 0, 0);
+		});
+
+		//destruidor 3
+		gltfLoader.load(urldes, (gltf) => {
+			gltf.scene.scale.set(0.1, 0.1, 0.1);
+			const root = gltf.scene;
+			console.log(dumpObject(root).join('\n')); // Chamando função dumpObject
+			destruidor3 = root.getObjectByName('Sketchfab_Scene');
+			scene.add(root);
+
+			// Posição e rotação do destroyer
+			destruidor3.position.x = 6.6;
+			destruidor3.position.y = 6.6;
+			destruidor3.position.z = 2.6;
+			destruidor3.rotateY(1.5708);
+
+			// Adicionando rotação local ao destroyer
+			destruidor3.localRotation = new THREE.Euler(0, 0, 0);
+		});
+
+		// Função para exibir informações estruturais no console
+		function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+  			const localPrefix = isLast ? '└─' : '├─';
+  			lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
+  			const newPrefix = prefix + (isLast ? '  ' : '│ ');
+  			const lastNdx = obj.children.length - 1;
+  			obj.children.forEach((child, ndx) => {
+    			const isLast = ndx === lastNdx;
+    			dumpObject(child, lines, isLast, newPrefix);
+  			});
+  			return lines;
+		}
+
+		// Carrega a textura
+		var loader = new THREE.TextureLoader();
+
+		// Carregando imagens com o loader
+		var colorMap = loader.load("img/earth.jpg"); // Carregando textura da terra
+		var colorMap2 = loader.load("img/sol.jpeg"); // Carregando textura fo sol
+		var colorMap3 = loader.load("img/lua.jpeg"); // Carregando textura da lua
+		var colorMap4 = loader.load("img/piramide2.jpeg"); // Carregando textura da lua
+		var colorMap5 = loader.load("img/asteroide.png"); // Carregando textura do asteroide
+		var spacebg = loader.load("img/espaco.jpg"); // Carregando plano de funto
+		var normalMap = loader.load("img/normal.jpg"); // Carregando normal
+		var specMap = loader.load("img/specular.jpg"); // Carregando specular
+
+		// Adicionando background a cena
+		scene.background = spacebg;
+
+		// Material da terra
+		var material1 = new THREE.MeshPhongMaterial({
+			color: 0xffffff,
+			map: colorMap,
+			normalMap: normalMap,
+			specularMap: specMap,
+			specular: 0x333333,
+			shininess: 15
+		});
+
+		// Material do sol
+		var material2 = new THREE.MeshPhongMaterial({
+			color: 0xffffff,
+			map: colorMap2,
+			shininess: 30
+		});
+
+		//material da lua
+		var material3 = new THREE.MeshPhongMaterial({
+			color: 0xffffff,
+			map: colorMap3,
+			shininess: 30
+		});
+
+		 var material4 = new THREE.MeshPhongMaterial({
+		 	color: 0xffffff,
+		 	map: colorMap4,
+		 	shininess: 30
+		 });
+
+		  var material5 = new THREE.MeshPhongMaterial({
+		  	color: 0xffffff,
+		  	map: colorMap5,
+			shininess: 10
+		});
+
+		 
+		// Terra
+		const geometry = new THREE.SphereGeometry( 5, 64, 32 );
+		const sphere1 = new THREE.Mesh( geometry, material1);
+
+		// Adicionando elementos a cena
+		scene.add(sphere1);
+
+		// Sol
+		const geometry2 = new THREE.SphereGeometry( 10, 118, 54 );
+		const sphere2 = new THREE.Mesh( geometry2, material2);
+
+		sphere2.position.x = -150.0;
+		sphere2.position.y = 0.0;
+		sphere2.position.z = 40.0;
+
+		// Adicionando elementos a cena
+		scene.add(sphere2);
+
+		// Lua
+		const geometry3 = new THREE.SphereGeometry( 0.6, 20, 16 );
+		const sphere3 = new THREE.Mesh( geometry3, material3);
+
+		sphere3.position.x = 19.0;
+		sphere3.position.y = 5.0;
+		sphere3.position.z = 0.0;
+
+		scene.add(sphere3);
+
+		// Piramide
+		const geometry4 = new THREE.ConeGeometry( 0.5, 0.5, 4 ); 
+		const cone = new THREE.Mesh(geometry4, material4 ); 
+		
+		cone.position.x = 4;
+		cone.position.y = 2.4;
+		cone.position.z = -2.3;
+
+		cone.rotation.x = 0;
+		cone.rotation.y = 0.5;
+		cone.rotation.z = -1.1;
+		
+		cone.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add( cone );
+
+		// Ateroides
+
+		//1
+		const geometry5 = new THREE.DodecahedronGeometry(0.1,1,2);
+		const dodecahedron = new THREE.Mesh(geometry5, material5);
+		
+		dodecahedron.position.set(8, 5, 5);
+
+		dodecahedron.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron);
+
+		//2
+		const geometry6 = new THREE.DodecahedronGeometry(0.1,1,2);
+		const dodecahedron2 = new THREE.Mesh(geometry6, material5);
+		
+		dodecahedron2.position.set(9, 6, 5);
+
+		dodecahedron2.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron2);
+
+		//3
+		const geometry7 = new THREE.DodecahedronGeometry(0.2,1,2);
+		const dodecahedron3 = new THREE.Mesh(geometry7, material5);
+		
+		dodecahedron3.position.set(11, 5, 5);
+
+		dodecahedron3.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron3);
+
+		//4
+		const geometry8 = new THREE.DodecahedronGeometry(0.4,1,2);
+		const dodecahedron4 = new THREE.Mesh(geometry8, material5);
+		
+		dodecahedron4.position.set(10, 10, 5);
+
+		dodecahedron4.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron4);
+
+		//5
+		const geometry9 = new THREE.DodecahedronGeometry(0.15,1,2);
+		const dodecahedron5 = new THREE.Mesh(geometry5, material5);
+		
+		dodecahedron5.position.set(10, 5, -5);
+
+		dodecahedron5.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron5);
+
+		//6
+		const geometry10 = new THREE.DodecahedronGeometry(0.25,1,2);
+		const dodecahedron6 = new THREE.Mesh(geometry10, material5);
+
+		dodecahedron6.position.set(9, 5, -11);
+
+		dodecahedron6.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron6);
+
+		//7
+		const geometry11 = new THREE.DodecahedronGeometry(0.3,1,2);
+		const dodecahedron7 = new THREE.Mesh(geometry11, material5);
+
+		dodecahedron7.position.set(10, -5, 5);
+
+		dodecahedron7.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron7);
+
+		//8
+		const geometry12 = new THREE.DodecahedronGeometry(0.01,1,2);
+		const dodecahedron8 = new THREE.Mesh(geometry12, material5);
+
+		dodecahedron8.position.set(11 -5, -8);
+
+		dodecahedron8.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron8);
+
+		//9
+		const geometry13 = new THREE.DodecahedronGeometry(0.6,1,2);
+		const dodecahedron9 = new THREE.Mesh(geometry13, material5);
+
+		dodecahedron9.position.set(9, -5, 12);
+
+		dodecahedron9.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron9);
+
+		//10
+		const geometry14 = new THREE.DodecahedronGeometry(0.35,1,2);
+		const dodecahedron10 = new THREE.Mesh(geometry14, material5);
+
+		dodecahedron10.position.set(10, 5, 11);
+
+		dodecahedron10.localRotation = new THREE.Euler(0, 0, 0);
+
+		scene.add(dodecahedron10);				
+
+		// Posição inicial da camêra
+		camera.position.x = 21;
+		camera.position.y = 3.6;
+		camera.position.z = -10.5;	
+
+		// Matriz de rotação satelite
+		const myast = new THREE.Matrix4();
+		myast.makeRotationY(-0.003);
+		myast.makeRotationZ(-0.003);
+
+		// Matriz do destroyer
+		const mydes = new THREE.Matrix4();
+		mydes.makeRotationY(0.001);
+
+		// Matriz da piramide
+		const mypir = new THREE.Matrix4();
+		mypir.makeRotationY(0.0005);
+
+		const myastero = new THREE.Matrix4();
+		 myastero.makeRotationY(0.0009);
+
+
+		 const myastero2 = new THREE.Matrix4();
+		 myastero2.makeRotationY(0.005);
+		 myastero2.makeRotationZ(-0.005);
+
+		 const myastero3 = new THREE.Matrix4();
+		 myastero3.makeRotationY(0.001);
+		 myastero3.makeRotationZ(0.001);
+
+		 const myastero4 = new THREE.Matrix4();
+		 myastero4.makeRotationY(-0.005);
+		 myastero4.makeRotationZ(-0.005);
+
+		 const myastero5 = new THREE.Matrix4();
+		 myastero5.makeRotationY(-0.004);
+
+
+		 const myastero6 = new THREE.Matrix4();
+		 myastero6.makeRotationY(0.0009);
+
+		 const myastero7 = new THREE.Matrix4();
+		 myastero7.makeRotationY(0.006);
+
+		 const myastero8 = new THREE.Matrix4();
+		 myastero8.makeRotationY(-0.001);
+
+		 const myastero9 = new THREE.Matrix4();
+		 myastero9.makeRotationY(0.001);
+
+		 const myastero10 = new THREE.Matrix4();
+		 myastero10.makeRotationY(0.001);
+
+
+		// Animação
+		var animate = function () {
+			requestAnimationFrame(animate);		
+
+			// Rotacionando terra
+			sphere1.rotation.y += 0.0005;
+
+			// Rotacionando o sol
+			sphere2.rotation.y += 0.003;
+			sphere2.rotation.x += 0.003;
+
+			// Rotacionando a lua
+			sphere3.rotation.y += 0.0003;
+
+			// Rotacionando os asteroides
+			dodecahedron.rotation.y += 0.005;
+			dodecahedron.rotation.z += 0.005;
+
+			dodecahedron2.rotation.y += 0.006;
+			dodecahedron2.rotation.x += 0.007;
+
+			dodecahedron3.rotation.z += 0.005; 
+			dodecahedron3.rotation.x += 0.005; 
+
+			dodecahedron4.rotation.y += 0.007;
+			dodecahedron4.rotation.x += 0.008;
+
+			dodecahedron5.rotation.y += 0.0024;
+			dodecahedron5.rotation.z += 0.0024;
+
+			dodecahedron6.rotation.y += 0.0063;
+			dodecahedron6.rotation.x += 0.0036;
+
+			dodecahedron7.rotation.z += 0.009;
+			dodecahedron7.rotation.y += 0.009;
+
+			dodecahedron8.rotation.x += 0.007;
+			dodecahedron8.rotation.z += 0.007;
+
+			dodecahedron9.rotation.y += 0.009;
+			dodecahedron9.rotation.z += 0.009;
+
+			dodecahedron10.rotation.y += 0.005;
+			dodecahedron10.rotation.x += 0.005;
+
+
+			// Rotacionando satelite
+			satelite.applyMatrix4(myast);
+			satelite.localRotation.y += 0.008;
+
+			// Rotacionando os destroyers
+			destruidor.applyMatrix4(mydes);
+			destruidor.localRotation.y += 0.01;
+			
+			destruidor2.applyMatrix4(mydes);
+			destruidor2.localRotation.y += 0.01;
+
+			destruidor3.applyMatrix4(mydes);
+			destruidor3.localRotation.y += 0.01;
+
+			cone.applyMatrix4(mypir);
+			cone.localRotation.y += 0.0005;
+
+			 dodecahedron.applyMatrix4(myastero);
+			 dodecahedron.localRotation.y += 0.0005;
+
+			 dodecahedron2.applyMatrix4(myastero2);
+			 dodecahedron2.localRotation.y += 0.0005;
+
+			 dodecahedron3.applyMatrix4(myastero3);
+			 dodecahedron3.localRotation.y += 0.0005;
+
+			 dodecahedron4.applyMatrix4(myastero4);
+			 dodecahedron4.localRotation.y += 0.0005;
+
+			 dodecahedron5.applyMatrix4(myastero5);
+			 dodecahedron5.localRotation.y += 0.0005;
+
+			 dodecahedron6.applyMatrix4(myastero6);
+			 dodecahedron6.localRotation.y += 0.0005;
+
+			 dodecahedron7.applyMatrix4(myastero6);
+			 dodecahedron7.localRotation.y += 0.0005;
+
+			 dodecahedron8.applyMatrix4(myastero6);
+			 dodecahedron8.localRotation.y += 0.0005;
+
+			 dodecahedron9.applyMatrix4(myastero6);
+			 dodecahedron9.localRotation.y += 0.0005;
+
+			 dodecahedron10.applyMatrix4(myastero6);
+			 dodecahedron10.localRotation.y += 0.0005;			 
+
+			controls.update();
+			renderer.render(scene, camera);
+		};
+		animate();
+	</script>
+</body>
+
+</html>
